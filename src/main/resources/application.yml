@@ -1,0 +1,68 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: payment-service
+  datasource:
+    url: jdbc:postgresql://postgres:5432/paymentdb
+    username: payment
+    password: payment
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    open-in-view: false
+  sql:
+    init:
+      mode: always
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    tags:
+      application: payment-service
+  tracing:
+    enabled: true
+    sampling:
+      probability: 1.0
+    propagation:
+      type: w3c
+
+logging:
+  pattern:
+    level: "%5p [traceId=%X{traceId:-N/A} correlationId=%X{correlationId:-N/A}]"
+  level:
+    root: INFO
+    com.example.payment: INFO
+
+otel:
+  service:
+    name: payment-service
+  exporter:
+    otlp:
+      endpoint: http://jaeger:4318
+      protocol: http/protobuf
+  traces:
+    exporter: otlp
+  metrics:
+    exporter: otlp
+  logs:
+    exporter: otlp
+
+app:
+  downstream:
+    account-service:
+      url: http://localhost:8080/mock/account
+    scorify:
+      url: http://localhost:8080/mock/scorify
