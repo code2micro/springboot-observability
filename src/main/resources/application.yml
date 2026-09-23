@@ -66,3 +66,4 @@ app:
       url: http://localhost:8080/mock/account
     scorify:
       url: http://localhost:8080/mock/scorify
+      delay-ms: 0

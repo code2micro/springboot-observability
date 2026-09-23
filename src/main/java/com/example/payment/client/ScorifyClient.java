@@ -28,13 +28,16 @@ public class ScorifyClient {
     @Value("${app.downstream.scorify.url:http://localhost:8080/mock/scorify}")
     private String scorifyUrl;
 
+    @Value("${app.downstream.scorify.delay-ms:0}")
+    private long delayMs;
+
     public ScorifyClient(RestTemplate restTemplate, PaymentMetrics paymentMetrics) {
         this.restTemplate = restTemplate;
         this.paymentMetrics = paymentMetrics;
     }
 
     public ScorifyResponse callScorify(String transactionId, Long amount, String correlationId) {
-        String url = scorifyUrl + "?transactionId={transactionId}&amount={amount}";
+        String url = scorifyUrl + "?transactionId={transactionId}&amount={amount}&delay={delay}";
         HttpHeaders headers = new HttpHeaders();
         headers.set("X-Correlation-ID", correlationId);
         HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
@@ -47,7 +50,8 @@ public class ScorifyClient {
                     requestEntity,
                     ScorifyResponse.class,
                     transactionId,
-                    amount);
+                    amount,
+                    delayMs);
 
             ScorifyResponse body = response.getBody();
             if (body == null || !"APPROVED".equalsIgnoreCase(body.getStatus())) {
