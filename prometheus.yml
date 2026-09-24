@@ -6,4 +6,5 @@ scrape_configs:
   - job_name: 'payment-service'
     metrics_path: /actuator/prometheus
     static_configs:
-      - targets: ['payment-service:8080']
+      - targets: ['localhost:8080']
+
